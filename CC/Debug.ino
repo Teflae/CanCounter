@@ -81,7 +81,14 @@ void LoopDebug()
         Debugging = false;
         break;
       case 4: // Print display buffer
-        SerialPrintError("Not implemented");
+        for (size_t i = 0; i < 16; i++) // For every row
+        {
+          for (size_t j = 0; j < 16; j++) // For every column
+          {
+            Serial.print(((DisplayBuffer[i] & (1 << j)) ? "##" : "  ")); // Print "##" if that LED is on
+          }
+          Serial.println(); // Next row
+        }
         break;
     }
   }
