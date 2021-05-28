@@ -5,10 +5,18 @@
 //ROW(1) => Pin 6; change to your set up if different.
 #define ROW(x) (x+5)
 
+void MatrixSetup() {
+  pinMode( LATCH, OUTPUT);  //set up pins
+  pinMode( CLK, OUTPUT);
+  pinMode( DATA, OUTPUT);
+  pinMode( EN, OUTPUT);
+  pinMode( ROW(1), OUTPUT);
+  pinMode( ROW(2), OUTPUT);
+  pinMode( ROW(3), OUTPUT);
+  pinMode( ROW(4), OUTPUT);
+}
 
-
-
-void matrixData(short row, int bitmask) {
+void MatrixData(short row, int bitmask) {
   digitalWrite(EN, HIGH);
   digitalWrite(ROW(1), row & 1); // 0001
   digitalWrite(ROW(2), row & 2); // 0010
@@ -20,21 +28,4 @@ void matrixData(short row, int bitmask) {
   shiftOut(DATA, CLK, LSBFIRST, ~((bitmask >> 8) & 0xFF)); //higher portion
   digitalWrite(LATCH, HIGH);
   digitalWrite(EN, LOW);
-}
-
-void matrixSetup() {
-    // put your setup code here, to run once:
-  TIMSK0 = 0; // turn off timer0 for lower jitter
-  ADCSRA = 0xe5; // set the adc to free running mode
-  ADMUX = 0x40;  // use adc0
-  DIDR0 = 0x01;  // turn off the digital input for adc0
-
-  pinMode( LATCH, OUTPUT);  //set up pins
-  pinMode( CLK, OUTPUT);
-  pinMode( DATA, OUTPUT);
-  pinMode( EN, OUTPUT);
-  pinMode( ROW(1), OUTPUT);
-  pinMode( ROW(2), OUTPUT);
-  pinMode( ROW(3), OUTPUT);
-  pinMode( ROW(4), OUTPUT);
 }

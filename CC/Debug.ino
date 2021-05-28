@@ -92,16 +92,17 @@ void LoopDebug()
           Serial.println(); // Next row
         }
         break;
-      case 6:
-      if (wl < 2)
-      for (size_t i = 0; i < 16; i++) // For every row
-      {
-        DisplayBuffer[i] = words[i+1].toInt();
-      }
+      case 5: // Set buffer
+        if (wl < 2)
+          SerialPrintError("2 parameters needed");
+        else {
+          DisplayBuffer[words[i + 1].toInt()] = words[i + 1].toInt();
+        }
         break;
-      case 7:
+      case 6: // Um.... print buffer to Matrix
+        if(!USE_MATRIX) break;
         for (short i = 0; i < 16; i++) {
-          matrixData(i, DisplayBuffer[i]); // Replace '0b1001' with correct buffer row
+          MatrixData(i, DisplayBuffer[i]); // Replace '0b1001' with correct buffer row
           delay(2);
         }
         break;

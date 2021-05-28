@@ -18,6 +18,7 @@ const uint8_t PIN_LASER = 11;
 
 // Configurations. Overide them in your Local.ino file
 bool USE_EO = true;
+bool USE_MATRIX = true;
 
 // Global Variables
 double avg = 1;
@@ -38,7 +39,7 @@ void setup()
   Serial.begin(SERIAL_BAUD_RATE); // Init serial @ 56kHz
   pinMode(PIN_LASER, OUTPUT);
   if(USE_EO) digitalWrite(PIN_LASER, HIGH);
-  matrixSetup();
+  MatrixSetup();
 }
 
 void loop()
