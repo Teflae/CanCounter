@@ -6,15 +6,18 @@
   Comment everywhare for future people
 */
 // Settings. Keep in A-Z order or in files that are relavent, prefixed with 'const' with CamelCase.
-const double Dampen = 20.0;
-const double DampenLong = 2000.0;
-const double DebugTimeut = 60000; // ms before debug mode is exited.
-const String DebugMessage = "> CanCounter.ino | V0.1 | See manual for help";
-const unsigned long DelayModeNormal = 200;
-const unsigned long DelayModeDebug = 50;
-const unsigned long SerialBaudRate = 57600;
-const uint8_t PinLightSensor = A0;
-const uint8_t PinLaser = 11;
+const double DAMPEN = 20.0;
+const double DAMPEN_LONG = 2000.0;
+const double DEBUG_TIMEOUT = 60000; // ms before debug mode is exited.
+const String DEBUG_MESSAGE = "> CanCounter.ino | V0.1 | See manual for help";
+const unsigned long DELAY_MODE_NORMAL = 100;
+const unsigned long DELAY_MODE_DEBUG = 50;
+const unsigned long SERIAL_BAUD_RATE = 57600;
+const uint8_t PIN_LIGHT_SENSOR = A0;
+const uint8_t PIN_LASER = 11;
+
+// Configurations. Overide them in your Local.ino file
+bool USE_EO = true;
 
 // Global Variables
 double avg = 1;
@@ -30,9 +33,9 @@ void SerialPrintError(String message)
 
 void setup()
 {
-  Serial.begin(SerialBaudRate); // Init serial @ 56kHz
-  pinMode(PinLaser, OUTPUT);
-  digitalWrite(PinLaser, HIGH);
+  Serial.begin(SERIAL_BAUD_RATE); // Init serial @ 56kHz
+  pinMode(PIN_LASER, OUTPUT);
+  if(USE_EO) digitalWrite(PIN_LASER, HIGH);
 }
 
 void loop()
@@ -42,9 +45,9 @@ void loop()
   else
   { // Normal Mode
     // read the input on analog pin 0:
-    int sensorValue = analogRead(PinLightSensor);
-    damp = (damp * (Dampen - 1) + sensorValue) / Dampen;
-    avg = (avg * (DampenLong - 1) + sensorValue) / DampenLong;
+    int sensorValue = analogRead(PIN_LIGHT_SENSOR);
+    damp = (damp * (DAMPEN - 1) + sensorValue) / DAMPEN;
+    avg = (avg * (DAMPEN_LONG - 1) + sensorValue) / DAMPEN_LONG;
     // print out the value you read:
     Serial.print(sensorValue);
     Serial.print('|');
@@ -55,9 +58,9 @@ void loop()
     if (Serial.available() > 0)
     {
       Debugging = true;
-      DebugEnd = millis() + DebugTimeut;
-      Serial.println(DebugMessage);
+      DebugEnd = millis() + DEBUG_TIMEOUT;
+      Serial.println(DEBUG_MESSAGE);
     }
-    delay(DelayModeNormal);
+    delay(DELAY_MODE_NORMAL);
   }
 }

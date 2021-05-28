@@ -1,6 +1,6 @@
-const byte DebugCommandsLength = 5;
-const String DebugCommands[DebugCommandsLength] = {
-  // Assigns a number to the following commands. Change DebugCommandsLength when adding to this translation
+const byte DEBUG_COMMANDS_LENGTH = 5;
+const String DEBUG_COMMANDS[DEBUG_COMMANDS_LENGTH] = {
+  // Assigns a number to the following commands. Change DEBUG_COMMANDS_LENGTH when adding to this translation
   "unknown",
   "echo",
   "mod",
@@ -44,13 +44,13 @@ void LoopDebug()
       i = j;
       n++;
     }
-    DebugEnd = millis() + DebugTimeut; // Reset timeout
+    DebugEnd = millis() + DEBUG_TIMEOUT; // Reset timeout
 
     // Find Command
     n = 0; // let n be command number
-    for (i = 0; i < DebugCommandsLength; i++)
+    for (i = 0; i < DEBUG_COMMANDS_LENGTH; i++)
     {
-      if (DebugCommands[i] == command)
+      if (DEBUG_COMMANDS[i] == command)
       {
         n = i;
         break;
@@ -89,5 +89,5 @@ void LoopDebug()
   {
     Debugging = false;
   }
-  delay(DelayModeDebug);
+  delay(DELAY_MODE_DEBUG);
 }
