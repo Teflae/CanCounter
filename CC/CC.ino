@@ -38,6 +38,7 @@ void setup()
   Serial.begin(SERIAL_BAUD_RATE); // Init serial @ 56kHz
   pinMode(PIN_LASER, OUTPUT);
   if(USE_EO) digitalWrite(PIN_LASER, HIGH);
+  matrixSetup();
 }
 
 void loop()

@@ -1,4 +1,4 @@
-const byte DEBUG_COMMANDS_LENGTH = 5;
+const byte DEBUG_COMMANDS_LENGTH = 7;
 const String DEBUG_COMMANDS[DEBUG_COMMANDS_LENGTH] = {
   // Assigns a number to the following commands. Change DEBUG_COMMANDS_LENGTH when adding to this translation
   "unknown",
@@ -6,6 +6,8 @@ const String DEBUG_COMMANDS[DEBUG_COMMANDS_LENGTH] = {
   "mod",
   "exit",
   "buffer",
+  "setbuffer",
+  "printglyph",
 };
 
 void LoopDebug()
@@ -88,6 +90,19 @@ void LoopDebug()
             Serial.print(((DisplayBuffer[i] & (1 << j)) ? "##" : "  ")); // Print "##" if that LED is on
           }
           Serial.println(); // Next row
+        }
+        break;
+      case 6:
+      if (wl < 2)
+      for (size_t i = 0; i < 16; i++) // For every row
+      {
+        DisplayBuffer[i] = words[i+1].toInt();
+      }
+        break;
+      case 7:
+        for (short i = 0; i < 16; i++) {
+          matrixData(i, DisplayBuffer[i]); // Replace '0b1001' with correct buffer row
+          delay(2);
         }
         break;
     }
