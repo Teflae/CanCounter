@@ -10,10 +10,11 @@ const double Dampen = 20.0;
 const double DampenLong = 2000.0;
 const double DebugTimeut = 60000; // ms before debug mode is exited.
 const String DebugMessage = "> CanCounter.ino | V0.1 | See manual for help";
-const unsigned long DelayModeNormal = 1000;
+const unsigned long DelayModeNormal = 200;
 const unsigned long DelayModeDebug = 50;
 const unsigned long SerialBaudRate = 57600;
 const uint8_t PinLightSensor = A0;
+const uint8_t PinLaser = 11;
 
 // Global Variables
 double avg = 1;
@@ -30,6 +31,8 @@ void SerialPrintError(String message)
 void setup()
 {
   Serial.begin(SerialBaudRate); // Init serial @ 56kHz
+  pinMode(PinLaser, OUTPUT);
+  digitalWrite(PinLaser, HIGH);
 }
 
 void loop()
