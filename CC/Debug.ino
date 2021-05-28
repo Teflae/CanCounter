@@ -6,14 +6,15 @@ const String DEBUG_COMMANDS[DEBUG_COMMANDS_LENGTH] = {
   "mod",
   "exit",
   "buffer",
-  "setbuffer",
+  "set",
   "printglyph",
 };
 
 void LoopDebug()
 {
   if (Serial.available() > 0) // Recived command
-  {
+  {    
+    DebugEnd = millis() + DEBUG_TIMEOUT; // Reset timeout
     // Get message
     String message;
     while (Serial.available() > 0)
@@ -30,7 +31,7 @@ void LoopDebug()
     String command = (i != -1) ? message.substring(0, i) : message;
 
     // Count 'n' number of words, if any, and extract them
-    int wl = 0;
+    int wl = 0; // number of words
     while (i != -1)
     {
       i = message.indexOf(' ', i + 1);
@@ -46,7 +47,6 @@ void LoopDebug()
       i = j;
       n++;
     }
-    DebugEnd = millis() + DEBUG_TIMEOUT; // Reset timeout
 
     // Find Command
     n = 0; // let n be command number
@@ -87,8 +87,7 @@ void LoopDebug()
         {
           for (size_t j = 0; j < 16; j++) // For every column
           {
-            Serial.print(((DisplayBuffer[i] & (1 << (15 - j))) > 0) ? "<>" : "  "); // Print "##" if that LED is on
-            //Serial.print(((DisplayBuffer[i] & (1 << j)) > 0) ? "<>" : "  "); // Incase it's backwards
+            Serial.print(((DisplayBuffer[i] & (1 << (15 - j))) != 0) ? "<>" : ". "); // Print "<>" if that LED is on
           }
           //Serial.print(DisplayBuffer[i], BIN); // For testing
           Serial.println(); // Next row
