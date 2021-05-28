@@ -4,7 +4,6 @@
 #define EN 5
 //ROW(1) => Pin 6; change to your set up if different.
 #define ROW(x) (x+5)
-short DisplayBuffer[16];
 
 void setup() {
   // put your setup code here, to run once:

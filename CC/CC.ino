@@ -24,6 +24,7 @@ double avg = 1;
 double damp = 1;
 bool Debugging = false;
 unsigned long DebugEnd = 0;
+short DisplayBuffer[16];
 
 void SerialPrintError(String message)
 {
@@ -33,6 +34,7 @@ void SerialPrintError(String message)
 
 void setup()
 {
+  Local(); // * Define this function in your Local.ino file. It can be empty. That function will not be shared.
   Serial.begin(SERIAL_BAUD_RATE); // Init serial @ 56kHz
   pinMode(PIN_LASER, OUTPUT);
   if(USE_EO) digitalWrite(PIN_LASER, HIGH);
