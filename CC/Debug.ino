@@ -87,8 +87,10 @@ void LoopDebug()
         {
           for (size_t j = 0; j < 16; j++) // For every column
           {
-            Serial.print(((DisplayBuffer[i] & (1 << j)) ? "##" : "  ")); // Print "##" if that LED is on
+            Serial.print(((DisplayBuffer[i] & (1 << (15 - j))) > 0) ? "<>" : "  "); // Print "##" if that LED is on
+            //Serial.print(((DisplayBuffer[i] & (1 << j)) > 0) ? "<>" : "  "); // Incase it's backwards
           }
+          //Serial.print(DisplayBuffer[i], BIN); // For testing
           Serial.println(); // Next row
         }
         break;
@@ -96,7 +98,7 @@ void LoopDebug()
         if (wl < 2)
           SerialPrintError("2 parameters needed");
         else {
-          DisplayBuffer[words[i + 1].toInt()] = words[i + 1].toInt();
+          DisplayBuffer[words[1].toInt()] = words[2].toInt();
         }
         break;
       case 6: // Um.... print buffer to Matrix
