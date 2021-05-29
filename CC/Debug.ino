@@ -1,4 +1,4 @@
-const byte DEBUG_COMMANDS_LENGTH = 7;
+const byte DEBUG_COMMANDS_LENGTH = 8;
 const String DEBUG_COMMANDS[DEBUG_COMMANDS_LENGTH] = {
   // Assigns a number to the following commands. Change DEBUG_COMMANDS_LENGTH when adding to this translation
   "unknown",
@@ -8,25 +8,46 @@ const String DEBUG_COMMANDS[DEBUG_COMMANDS_LENGTH] = {
   "buffer",
   "set",
   "printglyph",
+  "test",
 };
+const byte TEST_FLAGS_LENGTH = 2;
+const String TEST_FLAGS[TEST_FLAGS_LENGTH] = {
+  "null",
+  "EO",
+};
+const int TEST_EO = 1;
+
+int Translate(String dictionary[], byte dictionaryLength, String in) { // Returns the index of the word in the dictionary that matches the input
+  in.toLowerCase();
+  int n = in.toInt();
+  if (n == 0) {
+    for (int i = 0; i < dictionaryLength; i++)
+    {
+      if (dictionary[i] == in) n = i;
+    }
+  }
+  if (n < 0 || n > dictionaryLength) n = 0;
+  return n;
+}
 
 void LoopDebug()
 {
   if (Serial.available() > 0) // Recived command
-  {    
+  {
     DebugEnd = millis() + DEBUG_TIMEOUT; // Reset timeout
     // Get message
     String message;
     while (Serial.available() > 0)
     {
       char in = Serial.read();
-      if (in == '\n')
-        break;     // '\n' is message seperator
+      if (in == '\n' || in == '/')
+        break;     // '\n' and '/' are message seperator
       message += in; // Add to buffer
       delay(10);     // Wait for more chars
     }
 
     // Extract the command
+    message.trim();
     int i = message.indexOf(' ');
     String command = (i != -1) ? message.substring(0, i) : message;
 
@@ -49,17 +70,17 @@ void LoopDebug()
     }
 
     // Find Command
-    n = 0; // let n be command number
-    for (i = 0; i < DEBUG_COMMANDS_LENGTH; i++)
-    {
-      if (DEBUG_COMMANDS[i] == command)
-      {
-        n = i;
-        break;
-      }
-    }
+    n = Translate(DEBUG_COMMANDS, DEBUG_COMMANDS_LENGTH, command); // let n be command number
+    // for (i = 0; i < DEBUG_COMMANDS_LENGTH; i++)
+    // {
+    //   if (DEBUG_COMMANDS[i] == command)
+    //   {
+    //     n = i;
+    //     break;
+    //   }
+    // }
     Serial.print("> ");
-    Serial.println(command); //TEST
+    Serial.println(DEBUG_COMMANDS[n]); //TEST
 
     // Run Command. There's no try-catch blocks in arduino so be careful
     switch (n)
@@ -95,21 +116,29 @@ void LoopDebug()
         break;
       case 5: // Set buffer
         if (wl < 2)
-          SerialPrintError("2 parameters needed");
+          SerialPrintError("2 parameters needed: a, b");
         else {
           DisplayBuffer[words[1].toInt()] = words[2].toInt();
         }
         break;
       case 6: // Um.... print buffer to Matrix
-        if(!USE_MATRIX) break;
+        if (!USE_MATRIX) break;
         for (short i = 0; i < 16; i++) {
           MatrixData(i, DisplayBuffer[i]); // Replace '0b1001' with correct buffer row
           delay(2);
         }
         break;
+      case 7: // Change test parameters
+        if (wl < 1)
+          SerialPrintError("1 parameters needed: ");
+        else {
+          Test = Translate(TEST_FLAGS, TEST_FLAGS_LENGTH, words[1]);
+          Serial.print("Test mode: ");
+          Serial.println(TEST_FLAGS[n]); //TEST
+        }
     }
   }
-  else if (millis() > DebugEnd)
+  else if (millis() > DebugEnd) // Exit debug mode ontimeout
   {
     Debugging = false;
   }

@@ -7,8 +7,8 @@
 */
 // Settings. Keep in A-Z order or in files that are relavent, prefixed with 'const' with CamelCase.
 const double DEBUG_TIMEOUT = 60000; // ms before debug mode is exited.
-const String DEBUG_MESSAGE = "> CanCounter.ino | V0.1 | See manual for help";
-const unsigned long DELAY_MODE_NORMAL = 100;
+const String DEBUG_MESSAGE = "> CanCounter.ino | V0.2 | See manual for help";
+const unsigned long DELAY_MODE_NORMAL = 10;
 const unsigned long DELAY_MODE_DEBUG = 50;
 const unsigned long SERIAL_BAUD_RATE = 57600;
 
@@ -19,8 +19,10 @@ bool USE_MATRIX = true;
 // Global Variables
 bool Debugging = false;
 unsigned long DebugEnd = 0;
+int Test = 0; // Test flag
+int AllCount = 0; //TODO: Load prev count.
 
-short DisplayBuffer[16] = { // Set to "CC\nTHS"
+short DisplayBuffer[16] = { // Set to "CC\nTHS", acts as splash screen
   0b1111111111111111,
   0b1100001110000111,
   0b1001111100111111,
@@ -29,7 +31,7 @@ short DisplayBuffer[16] = { // Set to "CC\nTHS"
   0b1100001110000111,
   0b1111111111111111,
   0b0000000000000000,
-  0b0111101001001100,
+  0b1111101001001100,
   0b0010001001010000,
   0b0010001111001100,
   0b0010001001000010,
@@ -49,6 +51,7 @@ void setup()
 {
   Local(); // * Define this function in your Local.ino file. It can be empty. That function will not be shared.
   Serial.begin(SERIAL_BAUD_RATE); // Init serial @ 56kHz
+  Serial.println(DEBUG_MESSAGE);
   MatrixSetup();
   if(USE_EO) SetupEO();
 }
@@ -59,8 +62,13 @@ void loop()
     LoopDebug(); // Debug Mode
   else
   { // Normal Mode
-    // read the input on analog pin 0:
     LoopEO();
+    if (Serial.available() > 0) // Debug mode trigger
+    {
+      Debugging = true;
+      DebugEnd = millis() + DEBUG_TIMEOUT;
+      Serial.println(DEBUG_MESSAGE);
+    }
     delay(DELAY_MODE_NORMAL);
   }
 }
