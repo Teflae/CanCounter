@@ -49,7 +49,7 @@ void SerialPrintError(String message)
 
 void setup()
 {
-  Local(); // * Define this function in your Local.ino file. It can be empty. That function will not be shared.
+ Local(); // * Define this function in your Local.ino file. It can be empty. That function will not be shared.
   Serial.begin(SERIAL_BAUD_RATE); // Init serial @ 56kHz
   Serial.println(DEBUG_MESSAGE);
   MatrixSetup();

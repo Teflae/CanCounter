@@ -123,10 +123,11 @@ void LoopDebug()
         break;
       case 6: // Um.... print buffer to Matrix
         if (!USE_MATRIX) break;
-        for (short i = 0; i < 16; i++) {
-          MatrixData(i, DisplayBuffer[i]); // Replace '0b1001' with correct buffer row
-          delay(2);
-        }
+        do {
+          for (short i = 0; i < 16; i++) {
+            matrixData(i, DisplayBuffer[i]); // Replace '0b1001' with correct buffer row
+          }
+        } while (USE_MATRIX);
         break;
       case 7: // Change test parameters
         if (wl < 1)

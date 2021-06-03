@@ -16,7 +16,7 @@ void MatrixSetup() {
   pinMode( ROW(4), OUTPUT);
 }
 
-void MatrixData(short row, int bitmask) {
+void matrixData(short row, int bitmask) {
   digitalWrite(EN, HIGH);
   digitalWrite(ROW(1), row & 1); // 0001
   digitalWrite(ROW(2), row & 2); // 0010
@@ -28,4 +28,10 @@ void MatrixData(short row, int bitmask) {
   shiftOut(DATA, CLK, LSBFIRST, ~((bitmask >> 8) & 0xFF)); //higher portion
   digitalWrite(LATCH, HIGH);
   digitalWrite(EN, LOW);
+  delay(1);
 }
+
+/*void LoopMatrix() {
+  if(USE_MATRIX) {
+    matrixData();
+  }*/
