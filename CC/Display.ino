@@ -31,7 +31,8 @@ void matrixData(short row, int bitmask) {
   delay(1);
 }
 
-/*void LoopMatrix() {
-  if(USE_MATRIX) {
-    matrixData();
-  }*/
+void LoopMatrix() {
+  for (short i = 0; i < 16; i++) {
+    matrixData(i, DisplayBuffer[i]); // Replace '0b1001' with correct buffer row
+  } while (USE_MATRIX);
+}
