@@ -1,14 +1,15 @@
-const byte DEBUG_COMMANDS_LENGTH = 8;
+const byte DEBUG_COMMANDS_LENGTH = 9;
 const String DEBUG_COMMANDS[DEBUG_COMMANDS_LENGTH] = {
   // Assigns a number to the following commands. Change DEBUG_COMMANDS_LENGTH when adding to this translation
   "unknown",
   "echo",
   "mod",
   "exit",
-  "buffer",
+  "buffer", //4
   "set",
   "printglyph",
   "test",
+  "ee-allcount" //8
 };
 const byte TEST_FLAGS_LENGTH = 2;
 const String TEST_FLAGS[TEST_FLAGS_LENGTH] = {
@@ -28,6 +29,12 @@ int Translate(String dictionary[], byte dictionaryLength, String in) { // Return
   }
   if (n < 0 || n > dictionaryLength) n = 0;
   return n;
+}
+
+void SerialPrintError(String message) // Standard format for printing errors
+{
+  Serial.print("! ");
+  Serial.println(message);
 }
 
 void LoopDebug()
@@ -123,18 +130,32 @@ void LoopDebug()
         break;
       case 6: // Um.... print buffer to Matrix
         if (!USE_MATRIX) break;
-          for (short i = 0; i < 16; i++) {
-            matrixData(i, DisplayBuffer[i]); // Replace '0b1001' with correct buffer row
-          } while (USE_MATRIX);
+        for (short i = 0; i < 16; i++) {
+          matrixData(i, DisplayBuffer[i]); // Replace '0b1001' with correct buffer row
+        }
         break;
       case 7: // Change test parameters
-        if (wl < 1)
+        if (wl < 1) {
           SerialPrintError("1 parameters needed: ");
+        }
         else {
-          Test = Translate(TEST_FLAGS, TEST_FLAGS_LENGTH, words[1]);
+          Test = Translate(TEST_FLAGS, TEST_FLAGS_LENGTH, words[1]); // Find correct test flag, and set to it
           Serial.print("Test mode: ");
           Serial.println(TEST_FLAGS[n]); //TEST
         }
+        break;
+      case 8: // Get or set EEPROM allcount value
+        if (wl < 1) {
+          Serial.print("EEPROM [AllCount] = ");
+          Serial.println(EEPROM.get(AllCountAddress, AllCount)); // Get All[Time]Count from EEPROM
+        }
+        else { // Set All[Time]Count
+          AllCount = words[1].toInt();
+          EEPROM.put(AllCountAddress, AllCount);
+          Serial.print("EEPROM [AllCount] = ");
+          Serial.println(AllCount); //TEST
+        }
+        break;
     }
   }
   else if (millis() > DebugEnd) // Exit debug mode ontimeout
