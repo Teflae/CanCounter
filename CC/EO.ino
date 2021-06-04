@@ -35,7 +35,7 @@ void LoopEO()
   if (millis() > PauseEnd && Reading <= Average && reading > Average) { // If not paused && Reading was abnormal && reading became normal
     PauseEnd = millis() + RESET_TIME; // Pause to prevent duplicate, or multiple counting of the same item
     AllCount++;
-    if (USE_EEPROM) EEPROM.put(AllCountAddress, AllCount);
+    if (USE_EEPROM && USE_EO) EEPROM.put(AllCountAddress, AllCount);
     //TODO: Weekly count
   }
   Reading = reading; // Now, set global variable Reading to it's local variable
