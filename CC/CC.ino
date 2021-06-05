@@ -10,7 +10,7 @@
 // Settings. Keep in A-Z order or in files that are relavent, prefixed with 'const' with CamelCase.
 const double DEBUG_TIMEOUT = 60000; // ms before debug mode is exited.
 const String DEBUG_MESSAGE = "> CanCounter.ino | V0.3 | See manual for help";
-const unsigned long DELAY_MODE_NORMAL = 1;
+const unsigned long DELAY_MODE_NORMAL = 10;
 const unsigned long DELAY_MODE_DEBUG = 50;
 const unsigned long SERIAL_BAUD_RATE = 57600;
 
@@ -35,6 +35,7 @@ bool Debugging = false; // Determines whether Normal mode || Debug (or console) 
 unsigned long DebugEnd = 0; // Timeout for debug mode
 unsigned long LoopStart = 0; // Timestamp at which the main loop() starts running
 int Test = 0; // Test flag
+bool Warning = false; // Resets every loop. Set to true to flash built-in LED to indicate error.
 
 short DisplayBuffer[16] = { // Set to "CC\nTHS", acts as splash screen
   0b1111111111111111,
@@ -65,6 +66,7 @@ void SerialPrintParam (unsigned long message, bool last = false) {
 void setup()
 {
   Local(); // * Define this function in your Local.ino file. It can be empty. That function will not be shared.
+  pinMode(LED_BUILTIN, OUTPUT);
   // Memory
   EEPROM.get(AllCountAddress, AllCount);
 
@@ -79,6 +81,7 @@ void setup()
 
 void loop()
 {
+  Warning = false;
   LoopStart = micros();
   if (Debugging)
     LoopDebug(); // Debug Mode
@@ -92,11 +95,30 @@ void loop()
       Serial.println(DEBUG_MESSAGE);
     }
     matrixLoop();
-    if (Test == TEST_TIMING) {
-      SerialPrintParam(micros() - LoopStart);
+
+    // Timing
+    unsigned long loopFinish = micros() - LoopStart;
+    
+    int delayTime = (DELAY_MODE_NORMAL * 1000) - (micros() - LoopStart); // Calculate remaining time to next cycle.
+    if (delayTime > 0) { // Is there enough time?
+      delayMicroseconds(delayTime);
+    }
+    else Warning = true;
+
+    // Warning indicator
+    if (Warning) {
+      digitalWrite(LED_BUILTIN, (millis() % 200 < 100) ? HIGH : LOW); // Else flash built-in LED
+    } else {        
+      digitalWrite(LED_BUILTIN, LOW); // Indicate that timing is ok.
+    }    
+    //delay(DELAY_MODE_NORMAL); // Regulate speed
+
+    // Timing
+    unsigned long LoopEnd = micros() - LoopStart;    
+    if (Test == TEST_TIMING) { // Printing to serial is time-intensive, and so TEST_TIMING flag is not timed.
+      SerialPrintParam(loopFinish);
       SerialPrintParam(AllCount);
+      SerialPrintParam(LoopEnd, true);
     }
-    delay(DELAY_MODE_NORMAL); // Regulate speed
-    if (Test == TEST_TIMING) SerialPrintParam(micros() - LoopStart, true);
-    }
+  }
 }
