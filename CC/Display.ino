@@ -28,12 +28,12 @@ void matrixData(short row, int bitmask) {
   shiftOut(DATA, CLK, LSBFIRST, ~((bitmask >> 8) & 0xFF)); //higher portion
   digitalWrite(LATCH, HIGH);
   digitalWrite(EN, LOW);
-  delay(1); //TODO: Remove if you can
 }
 
-void LoopMatrix() {
+void matrixLoop() {
   if (!USE_MATRIX) return; // If not using matrix, exit function
   for (short i = 0; i < 16; i++) {
     matrixData(i, DisplayBuffer[i]); // Print buffer row 'i'
+    delay(1);
   }
 }

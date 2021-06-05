@@ -10,7 +10,7 @@
 // Settings. Keep in A-Z order or in files that are relavent, prefixed with 'const' with CamelCase.
 const double DEBUG_TIMEOUT = 60000; // ms before debug mode is exited.
 const String DEBUG_MESSAGE = "> CanCounter.ino | V0.3 | See manual for help";
-const unsigned long DELAY_MODE_NORMAL = 10;
+const unsigned long DELAY_MODE_NORMAL = 1;
 const unsigned long DELAY_MODE_DEBUG = 50;
 const unsigned long SERIAL_BAUD_RATE = 57600;
 
@@ -73,6 +73,7 @@ void loop()
       DebugEnd = millis() + DEBUG_TIMEOUT;
       Serial.println(DEBUG_MESSAGE);
     }
+    matrixLoop();
     delay(DELAY_MODE_NORMAL); // Regulate speed
   }
 }
