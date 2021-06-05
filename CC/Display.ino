@@ -5,7 +5,7 @@
 //ROW(1) => Pin 6; change to your set up if different.
 #define ROW(x) (x+5)
 
-void MatrixSetup() {
+void SetupMatrix() {
   pinMode( LATCH, OUTPUT);  //set up pins
   pinMode( CLK, OUTPUT);
   pinMode( DATA, OUTPUT);
@@ -30,7 +30,7 @@ void matrixData(short row, int bitmask) {
   digitalWrite(EN, LOW);
 }
 
-void matrixLoop() {
+void LoopMatrix() {
   if (!USE_MATRIX) return; // If not using matrix, exit function
   for (short i = 0; i < 16; i++) {
     matrixData(i, DisplayBuffer[i]); // Print buffer row 'i'

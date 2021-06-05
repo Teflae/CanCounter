@@ -9,7 +9,7 @@
 
 // Settings. Keep in A-Z order or in files that are relavent, prefixed with 'const' with CamelCase.
 const double DEBUG_TIMEOUT = 60000; // ms before debug mode is exited.
-const String DEBUG_MESSAGE = "> CanCounter.ino | V0.3 | See manual for help";
+const String DEBUG_MESSAGE = "> CanCounter.ino | V0.4 | See manual for help";
 const unsigned long DELAY_MODE_NORMAL = 10; // Ensures that code runs every given milliseconds. Not really a delay.
 const unsigned long DELAY_MODE_DEBUG = 50;
 const unsigned long SERIAL_BAUD_RATE = 57600;
@@ -57,6 +57,26 @@ short DisplayBuffer[16] = { // Set to "CC\nTHS", acts as splash screen
   0b1111111111111111,
 };
 
+// Data
+// Record last 32 possible counts for debugging
+typedef struct {
+  bool Counted;
+  unsigned long Time;
+  unsigned int Duration;
+  float Reading;
+  float Average;
+} EOBreak;
+
+byte BreaksIndex = 0;
+EOBreak Breaks[32];
+
+// Declarations
+void Local(); // * Define this function in your Local.ino file. It can be empty. That function will not be shared.
+void SetupMatrix();
+void SetupEO();
+void LoopMatrix();
+void LoopEO();
+
 // Prints a message in standardised format, and terminates it if it is last.
 void SerialPrintParam (unsigned long message, bool last = false) {
   Serial.print(message);
@@ -76,7 +96,7 @@ void setup()
   Serial.println(DEBUG_MESSAGE);
 
   // Outsorced
-  MatrixSetup();
+  if (USE_MATRIX) SetupMatrix();
   if (USE_EO) SetupEO();
 }
 
@@ -94,7 +114,7 @@ void loop()
 
     // Code
     LoopEO();
-    matrixLoop();
+    LoopMatrix();
 
     // Check for serial
     if (Serial.available() > 0) // Debug mode triggers when messages are recived through Serial (USB) cable

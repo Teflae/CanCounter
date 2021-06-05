@@ -1,4 +1,4 @@
-const byte DEBUG_COMMANDS_LENGTH = 9;
+const byte DEBUG_COMMANDS_LENGTH = 10;
 const String DEBUG_COMMANDS[DEBUG_COMMANDS_LENGTH] = {
   // Assigns a number to the following commands. Change DEBUG_COMMANDS_LENGTH when adding to this translation
   "unknown",
@@ -9,7 +9,8 @@ const String DEBUG_COMMANDS[DEBUG_COMMANDS_LENGTH] = {
   "set",
   "printglyph",
   "test",
-  "ee-allcount" //8
+  "ee-allcount", //8
+  "breaks"
 };
 
 int Translate(String dictionary[], byte dictionaryLength, String in) { // Returns the index of the word in the dictionary that matches the input
@@ -118,7 +119,7 @@ void LoopDebug()
       case 6: // Um.... print buffer to Matrix
         if (!USE_MATRIX) break;
         for (short i = 0; i < 16; i++) {
-          matrixData(i, DisplayBuffer[i]); // Replace '0b1001' with correct buffer row
+          ///matrixData(i, DisplayBuffer[i]); // Replace '0b1001' with correct buffer row
         }
         break;
       case 7: // Change test parameters
@@ -128,7 +129,7 @@ void LoopDebug()
         else {
           Test = Translate(TEST_FLAGS, TEST_FLAGS_LENGTH, words[1]); // Find correct test flag, and set to it
           Serial.print("Test mode: ");
-          Serial.println(TEST_FLAGS[n]); //TEST
+          Serial.println(TEST_FLAGS[Test]); //TEST
         }
         break;
       case 8: // Get or set EEPROM allcount value
@@ -143,6 +144,15 @@ void LoopDebug()
           Serial.println(AllCount); //TEST
         }
         break;
+      case 9: // Print last 32 recorded breaks
+        for (size_t i = 0; i < 32; i++) {
+          SerialPrintParam(Breaks[i].Counted);
+          SerialPrintParam(Breaks[i].Time);
+          SerialPrintParam(Breaks[i].Duration);
+          SerialPrintParam(Breaks[i].Reading);
+          SerialPrintParam(Breaks[i].Average, true);
+        }
+        break;
     }
   }
   else if (millis() > DebugEnd) // Exit debug mode ontimeout
@@ -151,3 +161,4 @@ void LoopDebug()
   }
   delay(DELAY_MODE_DEBUG);
 }
+
