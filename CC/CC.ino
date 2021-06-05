@@ -19,12 +19,22 @@ bool USE_EEPROM = true; // For simulators, set to false to save your EEPROM from
 bool USE_EO = true; // Whether the Electro-optical system, the laser and photoresistor, are attached.
 bool USE_MATRIX = true; // Whether a display is physicly attached
 
+const byte TEST_FLAGS_LENGTH = 3;
+const String TEST_FLAGS[TEST_FLAGS_LENGTH] = {
+  "null",
+  "eo",
+  "timing"
+};
+const int TEST_EO = 1;
+const int TEST_TIMING = 2;
+
 // Global Variables
-bool Debugging = false; // Determines whether Normal mode || Debug (or console) mode is running.
-unsigned long DebugEnd = 0; // imeout for debug mode
-int Test = 0; // Test flag
 int AllCount = 0; // All-time total counts. Saved to EEPROM
 const int AllCountAddress = 0; // Position to save All-time count on EEPROM. If EEPROM does not work change this to a new location.
+bool Debugging = false; // Determines whether Normal mode || Debug (or console) mode is running.
+unsigned long DebugEnd = 0; // Timeout for debug mode
+unsigned long LoopStart = 0; // Timestamp at which the main loop() starts running
+int Test = 0; // Test flag
 
 short DisplayBuffer[16] = { // Set to "CC\nTHS", acts as splash screen
   0b1111111111111111,
@@ -45,9 +55,16 @@ short DisplayBuffer[16] = { // Set to "CC\nTHS", acts as splash screen
   0b1111111111111111,
 };
 
+// Prints a message in standardised format, and terminates it if it is last.
+void SerialPrintParam (unsigned long message, bool last = false) {
+  Serial.print(message);
+  if (last) Serial.println();
+  else Serial.print('|');
+}
+
 void setup()
 {
- Local(); // * Define this function in your Local.ino file. It can be empty. That function will not be shared.
+  Local(); // * Define this function in your Local.ino file. It can be empty. That function will not be shared.
   // Memory
   EEPROM.get(AllCountAddress, AllCount);
 
@@ -57,11 +74,12 @@ void setup()
 
   // Outsorced
   MatrixSetup();
-  if(USE_EO) SetupEO();
+  if (USE_EO) SetupEO();
 }
 
 void loop()
 {
+  LoopStart = micros();
   if (Debugging)
     LoopDebug(); // Debug Mode
   else
@@ -74,6 +92,11 @@ void loop()
       Serial.println(DEBUG_MESSAGE);
     }
     matrixLoop();
+    if (Test == TEST_TIMING) {
+      SerialPrintParam(micros() - LoopStart);
+      SerialPrintParam(AllCount);
+    }
     delay(DELAY_MODE_NORMAL); // Regulate speed
-  }
+    if (Test == TEST_TIMING) SerialPrintParam(micros() - LoopStart, true);
+    }
 }

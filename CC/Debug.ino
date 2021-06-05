@@ -11,12 +11,6 @@ const String DEBUG_COMMANDS[DEBUG_COMMANDS_LENGTH] = {
   "test",
   "ee-allcount" //8
 };
-const byte TEST_FLAGS_LENGTH = 2;
-const String TEST_FLAGS[TEST_FLAGS_LENGTH] = {
-  "null",
-  "EO",
-};
-const int TEST_EO = 1;
 
 int Translate(String dictionary[], byte dictionaryLength, String in) { // Returns the index of the word in the dictionary that matches the input
   in.toLowerCase();
@@ -78,16 +72,9 @@ void LoopDebug()
 
     // Find Command
     n = Translate(DEBUG_COMMANDS, DEBUG_COMMANDS_LENGTH, command); // let n be command number
-    // for (i = 0; i < DEBUG_COMMANDS_LENGTH; i++)
-    // {
-    //   if (DEBUG_COMMANDS[i] == command)
-    //   {
-    //     n = i;
-    //     break;
-    //   }
-    // }
-    Serial.print("> ");
-    Serial.println(DEBUG_COMMANDS[n]); //TEST
+    Serial.print(n);
+    Serial.print(">");
+    Serial.println(message);
 
     // Run Command. There's no try-catch blocks in arduino so be careful
     switch (n)
