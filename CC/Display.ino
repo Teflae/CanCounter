@@ -35,7 +35,7 @@ short DisplaySplash[16] = {
   0b1111111111111111,
 };
 
-void MatrixSetup() {
+void SetupMatrix() {
   pinMode( LATCH, OUTPUT);  //set up pins
   pinMode( CLK, OUTPUT);
   pinMode( DATA, OUTPUT);
@@ -153,3 +153,4 @@ void DisplayDigit(int digit) {
         break;
     }
   }
+}
