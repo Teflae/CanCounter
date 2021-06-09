@@ -4,7 +4,7 @@
 #define EN 5
 //ROW(1) => Pin 6; change to your set up if different.
 #define ROW(x) (x+5)
-const int LIBRARY_DIGITS[10][5][3] = {
+const bool LIBRARY_DIGITS[10][5][3] = {
   {{1, 1, 1}, {1, 0, 1}, {1, 0, 1}, {1, 0, 1}, {1, 1, 1}},
   {{0, 0, 1}, {0, 0, 1}, {0, 0, 1}, {0, 0, 1}, {0, 0, 1}},
   {{1, 1, 1}, {0, 0, 1}, {1, 1, 1}, {1, 0, 0}, {1, 1, 1}},
