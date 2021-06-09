@@ -4,8 +4,38 @@
 #define EN 5
 //ROW(1) => Pin 6; change to your set up if different.
 #define ROW(x) (x+5)
+const int LIBRARY_DIGITS[10][5][3] = {
+  {{1, 1, 1}, {1, 0, 1}, {1, 0, 1}, {1, 0, 1}, {1, 1, 1}},
+  {{0, 0, 1}, {0, 0, 1}, {0, 0, 1}, {0, 0, 1}, {0, 0, 1}},
+  {{1, 1, 1}, {0, 0, 1}, {1, 1, 1}, {1, 0, 0}, {1, 1, 1}},
+  {{1, 1, 1}, {0, 0, 1}, {1, 1, 1}, {0, 0, 1}, {1, 1, 1}},
+  {{1, 0, 1}, {1, 0, 1}, {1, 1, 1}, {0, 0, 1}, {0, 0, 1}},
+  {{1, 1, 1}, {1, 0, 0}, {1, 1, 1}, {0, 0, 1}, {1, 1, 1}},
+  {{1, 1, 1}, {1, 0, 0}, {1, 1, 1}, {1, 0, 1}, {1, 1, 1}},
+  {{1, 1, 1}, {0, 0, 1}, {0, 0, 1}, {0, 0, 1}, {0, 0, 1}},
+  {{1, 1, 1}, {1, 0, 1}, {1, 1, 1}, {1, 0, 1}, {1, 1, 1}},
+  {{1, 1, 1}, {1, 0, 1}, {1, 1, 1}, {0, 0, 1}, {1, 1, 1}},
+};
+short DisplaySplash[16] = {
+  0b1111111111111111,
+  0b1110000111000011,
+  0b1100111110011111,
+  0b1101111110111111,
+  0b1100111110011111,
+  0b1110000111000011,
+  0b1111111111111111,
+  0b0000000000000000,
+  0b1111101001001100,
+  0b0010001001010000,
+  0b0010001111001100,
+  0b0010001001000010,
+  0b0010001001001100,
+  0b0000000000000000,
+  0b0000000000000000,
+  0b1111111111111111,
+};
 
-void SetupMatrix() {
+void MatrixSetup() {
   pinMode( LATCH, OUTPUT);  //set up pins
   pinMode( CLK, OUTPUT);
   pinMode( DATA, OUTPUT);
@@ -30,10 +60,96 @@ void matrixData(short row, int bitmask) {
   digitalWrite(EN, LOW);
 }
 
-void LoopMatrix() {
+void matrixLoop() {
   if (!USE_MATRIX) return; // If not using matrix, exit function
-  for (short i = 0; i < 16; i++) {
-    matrixData(i, DisplayBuffer[i]); // Print buffer row 'i'
-    delay(1);
+  if (Debugging) { //display splash screen in debug mode
+    for (int i = 0; i < 16; i++) {
+      DisplayBuffer[i] = DisplaySplash[i];
+      for (short i = 0; i < 16; i++) {
+        matrixData(i, DisplayBuffer[i]); // Print buffer row 'i'
+        delay(1); //can't be removed
+      }
+    }
+  }
+  else {
+    DisplayDigit(AllCount);
+    for (short i = 0; i < 16; i++) {
+      matrixData(i, DisplayBuffer[i]); // Print buffer row 'i'
+      delay(1); //can't be removed
+    }
   }
 }
+
+void DisplayDigit(int digit) {
+  int n = digit;
+  int digits[4];
+  int rowprint = 0;
+  int bitprint = 2;
+  for (int i = 0; i < 16; i++) { //clearing buffer
+    DisplayBuffer[i] = 0b0000000000000000;
+  };
+  for (int i = 0; i < 4; i++) { //Splitting digit value into separate integers
+    digits[i] = n % 10;
+    n /= 10;
+  };
+  int j = 0;
+  for (int i = 0; i < 4; i++) {
+    switch (i) { //switching between each digit
+      case 1:
+        j = 0;
+        rowprint = 4;
+        for (int q = 0; q < 5; q++) {
+          do {
+            bitWrite(DisplayBuffer[j], rowprint, LIBRARY_DIGITS[digits[i]][q][bitprint]); //sets buffer to digit based on library array
+            rowprint++;
+            bitprint--;
+          } while (rowprint < 7);
+          rowprint = 4;
+          bitprint = 2;
+          j = j + 1;
+        }
+        break;
+      case 2:
+        j = 0;
+        rowprint = 8;
+        for (int q = 0; q < 5; q++) {
+          do {
+            bitWrite(DisplayBuffer[j], rowprint, LIBRARY_DIGITS[digits[i]][q][bitprint]);
+            rowprint++;
+            bitprint--;
+          } while (rowprint < 11);
+          rowprint = 8;
+          bitprint = 2;
+          j = j + 1;
+        }
+        break;
+      case 3:
+        j = 0;
+        rowprint = 12;
+        for (int q = 0; q < 5; q++) {
+          do {
+            bitWrite(DisplayBuffer[j], rowprint, LIBRARY_DIGITS[digits[i]][q][bitprint]);
+            rowprint++;
+            bitprint--;
+          } while (rowprint < 15);
+          rowprint = 12;
+          bitprint = 2;
+          j = j + 1;
+        }
+        break;
+      default:
+        j = 0;
+        rowprint = 0;
+        for (int q = 0; q < 5; q++) {
+          do {
+            bitWrite(DisplayBuffer[j], rowprint, LIBRARY_DIGITS[digits[i]][q][bitprint]);
+            rowprint++;
+            bitprint--;
+          } while (rowprint < 3);
+          rowprint = 0;
+          bitprint = 2;
+          j = j + 1;
+        }
+        break;
+    }
+  }

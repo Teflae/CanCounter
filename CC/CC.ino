@@ -40,11 +40,11 @@ bool Warning = false; // Resets every loop. Set to true to flash built-in LED to
 
 short DisplayBuffer[16] = { // Set to "CC\nTHS", acts as splash screen
   0b1111111111111111,
-  0b1100001110000111,
-  0b1001111100111111,
-  0b1011111101111111,
-  0b1001111100111111,
-  0b1100001110000111,
+  0b1110000111000011,
+  0b1100111110011111,
+  0b1101111110111111,
+  0b1100111110011111,
+  0b1110000111000011,
   0b1111111111111111,
   0b0000000000000000,
   0b1111101001001100,
@@ -104,17 +104,17 @@ void loop()
 {
   Warning = false;
   LoopStart = micros();
+  matrixLoop();
   if (Debugging)
     LoopDebug(); // Debug Mode
   else
-  { // Normal Mode    
+  { // Normal Mode
     if (Test == TEST_TIMING) {
       SerialPrintParam(LoopEnd, true);
     }
 
     // Code
     LoopEO();
-    LoopMatrix();
 
     // Check for serial
     if (Serial.available() > 0) // Debug mode triggers when messages are recived through Serial (USB) cable
@@ -130,19 +130,19 @@ void loop()
       SerialPrintParam(loopFinish);
       SerialPrintParam(AllCount);
     }
-    
+
     long delayTime = (DELAY_MODE_NORMAL * 1000) - (micros() - LoopStart); // Calculate remaining time to next cycle.
     if (delayTime > 0) { // Is there enough time?
       delayMicroseconds(delayTime);
-    }    
+    }
     else Warning = true;
 
     // Warning indicator
     if (Warning) {
       digitalWrite(LED_BUILTIN, (millis() % 200 < 100) ? HIGH : LOW); // Else flash built-in LED
-    } else {        
+    } else {
       digitalWrite(LED_BUILTIN, LOW); // Indicate that timing is ok.
     }
-    LoopEnd = micros() - LoopStart;    
+    LoopEnd = micros() - LoopStart;
   }
 }
